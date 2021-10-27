@@ -92,7 +92,7 @@ int main(int argc, const char * argv[]) {
     
     vector<lxMidiFile> midiFiles;
     
-
+    //
 
     
     string path = "/Users/alexandermathieu/Coding/TestArea/Midi/simple.mid";
