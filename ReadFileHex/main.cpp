@@ -11,6 +11,7 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
+#include <stdio.h>
 
 using namespace std;
 
@@ -20,13 +21,8 @@ public:
     int _dataStart, _dataEnd = 0;
     int _statusbyte, _databyte, _velocityByte = 0x00;
     int _ticksFirst, _ticksSecond = 0x00;
-    
-    
-    lxMidiFile(int a){
-        cout << a << endl;
-    };
-    
-    
+        
+    // create new midiEvent
     lxMidiFile(int dataStart, int dataEnd, int statusByte, int dataByte, int velocityByte, int ticksFirst, int ticksSecond)
     {
         _dataStart      = dataStart;
@@ -37,13 +33,11 @@ public:
         _ticksFirst     = ticksFirst;
         _ticksSecond    = ticksSecond;
     };
-    
-    
-    
 };
 
 
 // von rechts nach links lesen
+// Funktion prüfen. Ist das so korrekt?!
 int readByte (const vector<char> &midiFile, int startByte, int endByte)
 {
     int result = 0;
@@ -60,7 +54,9 @@ int readByte (const vector<char> &midiFile, int startByte, int endByte)
     return result;
 }
 
+
 // big endian
+// Funktion prüfen. Zusammenbauen als String -> zerlegen und mit 16^x multiplizieren?
 int buildByte (const vector<char> &midiFile, int startByte, int endByte)
 {
     int result = 0;
@@ -89,12 +85,11 @@ int main(int argc, const char * argv[]) {
     
     // char vector to read every byte of file
     vector<char> daten;
-    
+
+    // vector of midiFile objects
     vector<lxMidiFile> midiFiles;
     
-    //
-
-    
+    //string path = "/Users/alexandermathieu/Coding/TestArea/Midi/neu3.mid";
     string path = "/Users/alexandermathieu/Coding/TestArea/Midi/simple.mid";
     ifstream file( path.c_str(), ios_base::binary ); // read file binary
     
@@ -102,7 +97,8 @@ int main(int argc, const char * argv[]) {
 
     cout << daten.size() << " Bytes gelesen" << endl;
     
-    if( daten.size() > 0 ){
+    if( daten.size() > 0 )
+    {
         
         // WICHTIG: ZUERST IN UNSIGNED CHAR CASTEN!!!!
 
@@ -120,6 +116,9 @@ int main(int argc, const char * argv[]) {
         cout << " File format:      " << readByte(daten, 8, 9) << endl;
         cout << " Number Tracks:    " << readByte(daten, 10, 11) << endl;
         cout << " Delta-time t/qn:  " << readByte(daten, 12, 13) << endl;
+        
+        
+        string headerChunk = readText(daten, 0, 3);
         
         int deltaTime = readByte(daten, 12, 13);
         
@@ -150,15 +149,16 @@ int main(int argc, const char * argv[]) {
         int ticksFirst = 0;
         int ticksSecond = 0;
         
+        // unused
         int ticksAbsolute = 0;
         
         bool foundMidiCommand = false;
-        
+                
         // loop rest of midi data
         for (int z = startLoop; z < (int)daten.size(); z++)
         {
-            // EXIT
-            // end of track Meta-message "ff 2f 00"
+            // EXIT condition
+            // end of track Meta-message "00 ff 2f 00"
             if ((int)(unsigned char)daten[z-1] == 47 && (int)(unsigned char)daten[z] == 0){
                 cout << "---END OF TRACK---" << endl;
                 break;
@@ -222,60 +222,73 @@ int main(int argc, const char * argv[]) {
                             
                     ticksAbsolute = 0;
                     
+                    // add midiEvent to vector
                     lxMidiFile mf(dataStart, dataEnd, statusByte, dataByte, velocityByte, ticksFirst, ticksSecond);
                     midiFiles.push_back(mf);
-                        
+                    
+                    // skip values
+                    z = dataEnd;
                         
                     // reset values
                     dataStart       = 0;
                     dataEnd         = 0;
-                    
                     statusByte      = 0;
                     dataByte        = 0;
                     velocityByte    = 0;
-                    
                     ticksFirst      = 0;
-                            
-                            
-                            
-                    
-                    
-
+                    ticksSecond     = 0;
                 }
-                
-                
-
-    
-                
-                
-                /*
-                cout << "----------------------------" << endl;
-                cout << "ticks :    " << std::hex << (int)(unsigned char)daten[z-1] << endl;
-                cout << "status:    " << std::hex << (int)(unsigned char)daten[z] << endl;
-                cout << "data:      " << std::hex << (int)(unsigned char)daten[z+1] << endl;
-                cout << "velocity:  " << std::hex << (int)(unsigned char)daten[z+2] << endl;
-                */
-                
-                
-                
             }
             
-            
-            
-
-            
-            
-            if (foundMidiCommand == true){
+            if (foundMidiCommand == true)
+            {
                 cout << "found command" << endl;
-                
             }
-            
+        }
+        cout << std::hex << (int)daten[(int)daten.size() - fileSizeMidiEvents];
+        
+        
+        /*
+        string pathWriteFolder= "/Users/alexandermathieu/Coding/TestArea/Midi/";
+        string pathWriteFileName = "neuuu.mid";
+        
+        char blub[] = {'a','b','c'};
+        
+        
+        FILE* wFile;
+    
+        wFile = fopen("/Users/alexandermathieu/Coding/TestArea/Midi/NEU112.mid", "w+b");
+        
+        
+        fwrite(&daten ,sizeof(char) ,sizeof(daten),wFile);
+        
+        cout << "hallooo   "<< sizeof(char) << endl;
+        */
+        /*
+        for (int z = 0; z < daten.size(); z++){
+            fwrite(&daten[z],sizeof(unsigned char),sizeof(daten),wFile);
+        }
+        fclose(wFile);*/
+        
+        
+        int age = 12;
+        
+        
+        std::ofstream fs("/Users/alexandermathieu/Coding/TestArea/Midi/jou2.mid", std::ios::out | std::ios::binary | std::ios::app);
+        
+        //fs << headerChunk;
+        
+        for (int z = 0; z < daten.size(); z++){
+            fs.write(reinterpret_cast<const char*>(&daten[z]),1);
         }
         
         
         
-        
-        cout << std::hex << (int)daten[(int)daten.size() - fileSizeMidiEvents];
+        /*
+        fs.write(blub, sizeof blub);
+        //fs.write(reinterpret_cast<const char*>(&age), sizeof age);
+        fs.write(reinterpret_cast<const char*>(&age), sizeof age);*/
+        fs.close();
         
     }
     return 0;
