@@ -25,6 +25,10 @@
 /* Begin PBXFileReference section */
 		D875FF6E2722CA57008CDE9D /* ReadFileHex */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ReadFileHex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D875FF712722CA57008CDE9D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		D875FF782722CEEE008CDE9D /* blah.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = blah.txt; sourceTree = "<group>"; };
+		D875FF792722CFC1008CDE9D /* blah.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = blah.wav; sourceTree = "<group>"; };
+		D875FF7A2722CFC1008CDE9D /* blah.mid */ = {isa = PBXFileReference; lastKnownFileType = audio.midi; path = blah.mid; sourceTree = "<group>"; };
+		D875FF7B2722CFC1008CDE9D /* blah.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = blah.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +61,11 @@
 		D875FF702722CA57008CDE9D /* ReadFileHex */ = {
 			isa = PBXGroup;
 			children = (
+				D875FF7B2722CFC1008CDE9D /* blah.jpg */,
+				D875FF7A2722CFC1008CDE9D /* blah.mid */,
+				D875FF792722CFC1008CDE9D /* blah.wav */,
 				D875FF712722CA57008CDE9D /* main.cpp */,
+				D875FF782722CEEE008CDE9D /* blah.txt */,
 			);
 			path = ReadFileHex;
 			sourceTree = "<group>";
